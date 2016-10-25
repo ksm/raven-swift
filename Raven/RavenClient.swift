@@ -25,18 +25,18 @@ public enum RavenLogLevel: String {
 
 private var _RavenClientSharedInstance : RavenClient?
 
-public class RavenClient : NSObject {
+open class RavenClient : NSObject {
     //MARK: - Properties
-    public var extra: [String: AnyObject]
-    public var tags: [String: AnyObject]
-    public var user: [String: AnyObject]?
-    public let logger: String?
+    open var extra: [String: AnyObject]
+    open var tags: [String: AnyObject]
+    open var user: [String: AnyObject]?
+    open let logger: String?
 
     internal let config: RavenConfig?
 
-    private var dateFormatter : NSDateFormatter {
-        let dateFormatter = NSDateFormatter()
-        dateFormatter.timeZone = NSTimeZone(name: "UTC")
+    fileprivate var dateFormatter : DateFormatter {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         return dateFormatter
     }
@@ -48,7 +48,7 @@ public class RavenClient : NSObject {
     /**
     Get the shared RavenClient instance
     */
-    public class var sharedClient: RavenClient? {
+    open class var sharedClient: RavenClient? {
         return _RavenClientSharedInstance
     }
 
@@ -118,7 +118,7 @@ public class RavenClient : NSObject {
 
     :returns: The RavenClient instance
     */
-    public class func clientWithDSN(DSN: String, extra: [String: AnyObject], tags: [String: AnyObject], logger: String?) -> RavenClient? {
+    open class func clientWithDSN(_ DSN: String, extra: [String: AnyObject], tags: [String: AnyObject], logger: String?) -> RavenClient? {
         if let config = RavenConfig(DSN: DSN) {
             let client = RavenClient(config: config, extra: extra, tags: tags, logger: logger)
             
@@ -146,7 +146,7 @@ public class RavenClient : NSObject {
 
     :returns: The RavenClient instance
     */
-    public class func clientWithDSN(DSN: String, extra: [String: AnyObject], tags: [String: AnyObject]) -> RavenClient? {
+    open class func clientWithDSN(_ DSN: String, extra: [String: AnyObject], tags: [String: AnyObject]) -> RavenClient? {
         return RavenClient.clientWithDSN(DSN, extra: extra, tags: tags, logger: nil)
     }
 
@@ -158,7 +158,7 @@ public class RavenClient : NSObject {
 
     :returns: The RavenClient instance
     */
-    public class func clientWithDSN(DSN: String, extra: [String: AnyObject]) -> RavenClient? {
+    open class func clientWithDSN(_ DSN: String, extra: [String: AnyObject]) -> RavenClient? {
         return RavenClient.clientWithDSN(DSN, extra: extra, tags: [:])
     }
 
@@ -168,7 +168,7 @@ public class RavenClient : NSObject {
 
     :returns: The RavenClient instance
     */
-    public class func clientWithDSN(DSN: String) -> RavenClient? {
+    open class func clientWithDSN(_ DSN: String) -> RavenClient? {
         return RavenClient.clientWithDSN(DSN, extra: [:])
     }
 
@@ -181,7 +181,7 @@ public class RavenClient : NSObject {
 
     :param: message  The message to be logged
     */
-    public func captureMessage(message : String, method: String? = #function , file: String? = #file, line: Int = #line) {
+    open func captureMessage(_ message : String, method: String? = #function , file: String? = #file, line: Int = #line) {
         self.captureMessage(message, level: .Info, additionalExtra:[:], additionalTags:[:], method:method, file:file, line:line)
     }
 
@@ -192,7 +192,7 @@ public class RavenClient : NSObject {
     :param: message  The message to be logged
     :param: level  log level
     */
-    public func captureMessage(message: String, level: RavenLogLevel, method: String? = #function , file: String? = #file, line: Int = #line){
+    open func captureMessage(_ message: String, level: RavenLogLevel, method: String? = #function , file: String? = #file, line: Int = #line){
         self.captureMessage(message, level: level, additionalExtra:[:], additionalTags:[:], method:method, file:file, line:line)
     }
 
@@ -205,14 +205,14 @@ public class RavenClient : NSObject {
     :param: additionalExtra  Additional data that will be sent with the log
     :param: additionalTags  Additional tags that will be sent with the log
     */
-    public func captureMessage(message: String, level: RavenLogLevel, additionalExtra:[String: AnyObject], additionalTags: [String: AnyObject], method:String? = #function, file:String? = #file, line:Int = #line) {
+    open func captureMessage(_ message: String, level: RavenLogLevel, additionalExtra:[String: AnyObject], additionalTags: [String: AnyObject], method:String? = #function, file:String? = #file, line:Int = #line) {
         var stacktrace : [AnyObject] = []
         var culprit : String = ""
 
         if (method != nil && file != nil && line > 0) {
             let filename = (file! as NSString).lastPathComponent;
-            let frame = ["filename" : filename, "function" : method!, "lineno" : line]
-            stacktrace = [frame]
+            let frame = ["filename" : filename, "function" : method!, "lineno" : line] as [String : Any]
+            stacktrace = [frame as AnyObject]
             culprit = "\(method!) in \(filename)"
         }
 
@@ -229,7 +229,7 @@ public class RavenClient : NSObject {
 
     :param: error  The error to capture
     */
-    public func captureError(error : NSError, method: String? = #function, file: String? = #file, line: Int = #line) {
+    open func captureError(_ error : NSError, method: String? = #function, file: String? = #file, line: Int = #line) {
         self.captureMessage("\(error)", level: .Error, method: method, file: file, line: line )
     }
 
@@ -241,7 +241,7 @@ public class RavenClient : NSObject {
 
     :param: error  The error to capture
     */
-    public func captureError<E where E:ErrorType, E:StringLiteralConvertible>(error: E, method: String? = #function, file: String? = #file, line: Int = #line) {
+    open func captureError<E>(_ error: E, method: String? = #function, file: String? = #file, line: Int = #line) where E:Error, E:ExpressibleByStringLiteral {
         self.captureMessage("\(error)", level: .Error, method: method, file: file, line: line )
     }
 
@@ -254,7 +254,7 @@ public class RavenClient : NSObject {
 
     :param: exception  The exception to be captured.
     */
-    public func captureException(exception: NSException) {
+    open func captureException(_ exception: NSException) {
         self.captureException(exception, sendNow:true)
     }
 
@@ -264,7 +264,7 @@ public class RavenClient : NSObject {
 
     :param: exception  The exception to be captured.
     */
-    public func captureUncaughtException(exception: NSException) {
+    open func captureUncaughtException(_ exception: NSException) {
         self.captureException(exception, sendNow: false)
     }
 
@@ -277,9 +277,9 @@ public class RavenClient : NSObject {
     :param: additionalTags  Additional tags that will be sent with the log
     :param: sendNow  Control whether the exception is sent to the server now, or when the app is next opened
     */
-    public func captureException(exception:NSException, additionalExtra:[String: AnyObject], additionalTags: [String: AnyObject], sendNow:Bool) {
+    open func captureException(_ exception:NSException, additionalExtra:[String: AnyObject], additionalTags: [String: AnyObject], sendNow:Bool) {
         let message = "\(exception.name): \(exception.reason ?? "")"
-        let exceptionDict = ["type": exception.name, "value": exception.reason ?? ""]
+        let exceptionDict = ["type": exception.name, "value": exception.reason ?? ""] as [String : Any]
 
         let callStack = exception.callStackSymbols
 
@@ -291,22 +291,22 @@ public class RavenClient : NSObject {
             }
         }
 
-        let data = self.prepareDictionaryForMessage(message, level: .Fatal, additionalExtra: additionalExtra, additionalTags: additionalTags, culprit: nil, stacktrace: stacktrace, exception: exceptionDict)
+        let data = self.prepareDictionaryForMessage(message, level: .Fatal, additionalExtra: additionalExtra, additionalTags: additionalTags, culprit: nil, stacktrace: stacktrace as [AnyObject], exception: exceptionDict as! [String : String])
 
-        if let JSON = self.encodeJSON(data) {
+        if let JSON = self.encodeJSON(data as AnyObject) {
             if (!sendNow) {
                 // We can't send this exception to Sentry now, e.g. because the app is killed before the
                 // connection can be made. So, save it into NSUserDefaults.
-                let JSONString = NSString(data: JSON, encoding: NSUTF8StringEncoding)
-                var reports = NSUserDefaults.standardUserDefaults().objectForKey(userDefaultsKey) as? [AnyObject]
+                let JSONString = NSString(data: JSON, encoding: String.Encoding.utf8.rawValue)
+                var reports = UserDefaults.standard.object(forKey: userDefaultsKey) as? [AnyObject]
                 if (reports != nil) {
                     reports!.append(JSONString!)
                 } else {
                     reports = [JSONString!]
                 }
 
-                NSUserDefaults.standardUserDefaults().setObject(reports, forKey:userDefaultsKey)
-                NSUserDefaults.standardUserDefaults().synchronize()
+                UserDefaults.standard.set(reports, forKey:userDefaultsKey)
+                UserDefaults.standard.synchronize()
             } else {
                 self.sendJSON(JSON)
             }
@@ -320,39 +320,39 @@ public class RavenClient : NSObject {
     :param: exception  The exception to be captured.
     :param: sendNow  Control whether the exception is sent to the server now, or when the app is next opened
     */
-    public func captureException(exception: NSException, method:String? = #function, file:String? = #file, line:Int = #line, sendNow:Bool = false) {
+    open func captureException(_ exception: NSException, method:String? = #function, file:String? = #file, line:Int = #line, sendNow:Bool = false) {
         let message = "\(exception.name): \(exception.reason ?? "")"
-        let exceptionDict = ["type": exception.name, "value": exception.reason ?? ""]
+        let exceptionDict = ["type": exception.name, "value": exception.reason ?? ""] as [String : Any]
 
         var stacktrace = [[String:AnyObject]]()
 
         if (method != nil && file != nil && line > 0) {
             var frame = [String: AnyObject]()
-            frame = ["filename" : (file! as NSString).lastPathComponent, "function" : method!, "lineno" : line]
+            frame = ["filename" : (file! as NSString).lastPathComponent as AnyObject, "function" : method! as AnyObject, "lineno" : line as AnyObject]
             stacktrace = [frame]
         }
 
         let callStack = exception.callStackSymbols
 
         for call in callStack {
-            stacktrace.append(["function": call])
+            stacktrace.append(["function": call as AnyObject])
         }
 
-        let data = self.prepareDictionaryForMessage(message, level: .Fatal, additionalExtra: [:], additionalTags: [:], culprit: nil, stacktrace: stacktrace, exception: exceptionDict)
+        let data = self.prepareDictionaryForMessage(message, level: .Fatal, additionalExtra: [:], additionalTags: [:], culprit: nil, stacktrace: stacktrace as [AnyObject], exception: exceptionDict as! [String : String])
 
-        if let JSON = self.encodeJSON(data) {
+        if let JSON = self.encodeJSON(data as AnyObject) {
             if (!sendNow) {
                 // We can't send this exception to Sentry now, e.g. because the app is killed before the
                 // connection can be made. So, save the JSON payload into NSUserDefaults.
-                let JSONString = NSString(data: JSON, encoding: NSUTF8StringEncoding)
-                var reports : [AnyObject]? = NSUserDefaults.standardUserDefaults().arrayForKey(userDefaultsKey)
+                let JSONString = NSString(data: JSON, encoding: String.Encoding.utf8.rawValue)
+                var reports : [AnyObject]? = UserDefaults.standard.array(forKey: userDefaultsKey) as [AnyObject]?
                 if (reports != nil) {
                     reports!.append(JSONString!)
                 } else {
                     reports = [JSONString!]
                 }
-                NSUserDefaults.standardUserDefaults().setObject(reports, forKey:userDefaultsKey)
-                NSUserDefaults.standardUserDefaults().synchronize()
+                UserDefaults.standard.set(reports, forKey:userDefaultsKey)
+                UserDefaults.standard.synchronize()
             } else {
                 self.sendJSON(JSON)
             }
@@ -363,20 +363,20 @@ public class RavenClient : NSObject {
     /**
     Automatically capture any uncaught exceptions
     */
-    public func setupExceptionHandler() {
-        UncaughtExceptionHandler.registerHandler(self)
+    open func setupExceptionHandler() {
+        UncaughtExceptionHandler.register(self)
         NSSetUncaughtExceptionHandler(exceptionHandlerPtr)
 
         // Process saved crash reports
-        let reports : [AnyObject]? = NSUserDefaults.standardUserDefaults().arrayForKey(userDefaultsKey)
+        let reports : [AnyObject]? = UserDefaults.standard.array(forKey: userDefaultsKey) as [AnyObject]?
         if (reports != nil && reports?.count > 0) {
             for data in reports! {
                 let JSONString = data as! String
-                let JSON = JSONString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
+                let JSON = JSONString.data(using: String.Encoding.utf8, allowLossyConversion: false)
                 self.sendJSON(JSON)
             }
-            NSUserDefaults.standardUserDefaults().setObject([], forKey: userDefaultsKey)
-            NSUserDefaults.standardUserDefaults().synchronize()
+            UserDefaults.standard.set([], forKey: userDefaultsKey)
+            UserDefaults.standard.synchronize()
         }
     }
 
@@ -384,36 +384,36 @@ public class RavenClient : NSObject {
     //MARK: - Internal methods
     internal func setDefaultTags() {
         if tags["Build version"] == nil {
-            if let buildVersion: AnyObject = NSBundle.mainBundle().infoDictionary?["CFBundleShortVersionString"]
+            if let buildVersion: AnyObject = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as AnyObject?
             {
-                tags["Build version"] = buildVersion as? String
+                tags["Build version"] = buildVersion as? String as AnyObject?
             }
         }
 
         #if os(iOS) || os(tvOS)
             if (tags["OS version"] == nil) {
-                tags["OS version"] = UIDevice.currentDevice().systemVersion
+                tags["OS version"] = UIDevice.current.systemVersion as AnyObject?
             }
 
             if (tags["Device model"] == nil) {
-                tags["Device model"] = UIDevice.currentDevice().model
+                tags["Device model"] = UIDevice.current.model as AnyObject?
             }
         #endif
 
     }
 
-    internal func sendDictionary(dict: [String: AnyObject]) {
-        let JSON = self.encodeJSON(dict)
+    internal func sendDictionary(_ dict: [String: AnyObject]) {
+        let JSON = self.encodeJSON(dict as AnyObject)
         self.sendJSON(JSON)
     }
 
     internal func generateUUID() -> String {
-        let uuid = NSUUID().UUIDString
-        let res = uuid.stringByReplacingOccurrencesOfString("-", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        let uuid = UUID().uuidString
+        let res = uuid.replacingOccurrences(of: "-", with: "", options: NSString.CompareOptions.literal, range: nil)
         return res
     }
 
-    private func prepareDictionaryForMessage(message: String,
+    fileprivate func prepareDictionaryForMessage(_ message: String,
         level: RavenLogLevel,
         additionalExtra: [String : AnyObject],
         additionalTags: [String : AnyObject],
@@ -434,9 +434,9 @@ public class RavenClient : NSObject {
             tags[entry.0] = entry.1
         }
 
-        let returnDict : [String: AnyObject] = ["event_id" : self.generateUUID(),
+        let returnDict : [String: AnyObject] = ["event_id" : self.generateUUID() as AnyObject,
             "project"   : self.config?.projectId ?? "",
-            "timestamp" : self.dateFormatter.stringFromDate(NSDate()),
+            "timestamp" : self.dateFormatter.string(from: Date()),
             "level"     : level.rawValue,
             "platform"  : "swift",
             "extra"     : extra,
@@ -451,17 +451,17 @@ public class RavenClient : NSObject {
         return returnDict
     }
 
-    private func encodeJSON(obj: AnyObject) -> NSData? {
+    fileprivate func encodeJSON(_ obj: AnyObject) -> Data? {
         do {
-            return try NSJSONSerialization.dataWithJSONObject(obj, options: [])
+            return try JSONSerialization.data(withJSONObject: obj, options: [])
         } catch _ {
             return nil
         }
     }
 
-    private func sendJSON(JSON: NSData?) {
+    fileprivate func sendJSON(_ JSON: Data?) {
         guard let config = self.config else {
-            guard let JSON = JSON, jsonString = String(data: JSON, encoding: NSUTF8StringEncoding) else {
+            guard let JSON = JSON, let jsonString = String(data: JSON, encoding: String.Encoding.utf8) else {
                 print("Could not print JSON using UTF8 encoding")
                 return
             }
@@ -470,22 +470,22 @@ public class RavenClient : NSObject {
             return
         }
 
-        let header = "Sentry sentry_version=\(sentryProtocol), sentry_client=\(sentryClient), sentry_timestamp=\(NSDate.timeIntervalSinceReferenceDate()), sentry_key=\(config.publicKey), sentry_secret=\(config.secretKey)"
+        let header = "Sentry sentry_version=\(sentryProtocol), sentry_client=\(sentryClient), sentry_timestamp=\(Date.timeIntervalSinceReferenceDate), sentry_key=\(config.publicKey), sentry_secret=\(config.secretKey)"
 
         #if DEBUG
         println(header)
         #endif
 
-        let request = NSMutableURLRequest(URL: config.serverUrl)
-        request.HTTPMethod = "POST"
+        let request = NSMutableURLRequest(url: config.serverUrl as URL)
+        request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("\(JSON?.length)", forHTTPHeaderField: "Content-Length")
-        request.HTTPBody = JSON
+        request.setValue("\(JSON?.count)", forHTTPHeaderField: "Content-Length")
+        request.httpBody = JSON
         request.setValue("\(header)", forHTTPHeaderField:"X-Sentry-Auth")
         
-        let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
-        let task = session.dataTaskWithRequest(request, completionHandler: {
+        let session = URLSession(configuration: URLSessionConfiguration.default)
+        let task = session.dataTask(with: request, completionHandler: {
             (_, response, error) in
             if let error = error {
                 let errorKey: AnyObject? = error.userInfo[NSURLErrorFailingURLStringErrorKey]
