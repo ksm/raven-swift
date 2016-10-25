@@ -11,10 +11,10 @@ import XCTest
 let testDSN = "http://public:secret@example.com/foo"
 
 class MockRavenClient : RavenClient {
-    var lastEvent: [String: AnyObject] = [:]
+    var lastEvent: [String: Any] = [:]
     var numEvents = 0
 
-    override func sendDictionary(dict: [String : AnyObject]) {
+    override func sendDictionary(_ dict: [String: Any]) {
         lastEvent = dict
         numEvents += 1
     }
@@ -252,7 +252,7 @@ class RavenClientTests: XCTestCase {
 
         let clientWithExtraAndTags = MockRavenClient(config: config!, extra: [firstKey: extraValue], tags: [firstKey: tagValue], logger: nil)
 
-        let additionalTags: [String: AnyObject] = [secondKey: tagValue, tagsIntegerKey: tagsIntegerValue, tagsBoolKey: tagsBoolValue]
+        let additionalTags: [String: AnyObject] = [secondKey: tagValue as AnyObject, tagsIntegerKey: tagsIntegerValue as AnyObject, tagsBoolKey: tagsBoolValue as AnyObject]
         clientWithExtraAndTags.captureMessage(testMessage, level: testLevel, additionalExtra: [secondKey: extraValue], additionalTags: additionalTags)
 
         let lastEvent = clientWithExtraAndTags.lastEvent
