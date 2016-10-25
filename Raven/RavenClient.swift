@@ -359,30 +359,6 @@ open class RavenClient : NSObject {
         }
     }
 
-
-    /**
-    Automatically capture any uncaught exceptions
-    */
-    open func setupExceptionHandler() {
-        UncaughtExceptionHandler.register(self)
-        NSSetUncaughtExceptionHandler(exceptionHandlerPtr)
-
-        // Process saved crash reports
-        let reports : [Any]? = UserDefaults.standard.array(forKey: userDefaultsKey) as [Any]?
-        
-        
-        if let reports = reports, !reports.isEmpty {
-            for data in reports {
-                let JSONString = data as! String
-                let JSON = JSONString.data(using: String.Encoding.utf8, allowLossyConversion: false)
-                self.sendJSON(JSON)
-            }
-            UserDefaults.standard.set([], forKey: userDefaultsKey)
-            UserDefaults.standard.synchronize()
-        }
-    }
-
-
     //MARK: - Internal methods
     internal func setDefaultTags() {
         if tags["Build version"] == nil {

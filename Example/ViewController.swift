@@ -23,10 +23,5 @@ class ViewController: UIViewController {
     @IBAction func sendMessage() {
         RavenClient.sharedClient?.captureMessage("Raven message test")
     }
-
-    
-    @IBAction func raiseUnhandledException() {
-        NSException(name: NSExceptionName(rawValue: "Raven test exception"), reason: "No reason", userInfo: nil).raise()
-    }
 }
 

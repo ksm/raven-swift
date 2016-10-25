@@ -14,9 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
       
-        if let client = RavenClient.clientWithDSN("https://663998f40e734ea59087883feda37647:306481b9f6bb4a6287b334178d9f8c71@app.getsentry.com/4394") {
-            client.setupExceptionHandler()
-        }
+        _ = RavenClient.clientWithDSN("https://663998f40e734ea59087883feda37647:306481b9f6bb4a6287b334178d9f8c71@app.getsentry.com/4394")
 
         return true
     }
