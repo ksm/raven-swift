@@ -11,10 +11,10 @@ import XCTest
 let testDSN = "http://public:secret@example.com/foo"
 
 class MockRavenClient : RavenClient {
-    var lastEvent: [String: AnyObject] = [:]
+    var lastEvent: [String: Any] = [:]
     var numEvents = 0
 
-    override func sendDictionary(_ dict: [String : AnyObject]) {
+    override func sendDictionary(_ dict: [String: Any]) {
         lastEvent = dict
         numEvents += 1
     }
