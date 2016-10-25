@@ -386,19 +386,18 @@ open class RavenClient : NSObject {
     //MARK: - Internal methods
     internal func setDefaultTags() {
         if tags["Build version"] == nil {
-            if let buildVersion: Any = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as Any?
-            {
-                tags["Build version"] = buildVersion as? String as Any?
+            if let buildVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] {
+                tags["Build version"] = buildVersion
             }
         }
 
         #if os(iOS) || os(tvOS)
             if (tags["OS version"] == nil) {
-                tags["OS version"] = UIDevice.current.systemVersion as Any?
+                tags["OS version"] = UIDevice.current.systemVersion
             }
 
             if (tags["Device model"] == nil) {
-                tags["Device model"] = UIDevice.current.model as Any?
+                tags["Device model"] = UIDevice.current.model
             }
         #endif
 
