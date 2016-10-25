@@ -472,8 +472,13 @@ open class RavenClient : NSObject {
             print(jsonString)
             return
         }
+        
+        guard let publicKey = config.publicKey, let secretKey = config.secretKey else {
+            print("Cannot send JSON as no private and/or secret key found")
+            return
+        }
 
-        let header = "Sentry sentry_version=\(sentryProtocol), sentry_client=\(sentryClient), sentry_timestamp=\(Date.timeIntervalSinceReferenceDate), sentry_key=\(config.publicKey), sentry_secret=\(config.secretKey)"
+        let header = "Sentry sentry_version=\(sentryProtocol), sentry_client=\(sentryClient), sentry_timestamp=\(Date.timeIntervalSinceReferenceDate), sentry_key=\(publicKey), sentry_secret=\(secretKey)"
 
         #if DEBUG
         println(header)
