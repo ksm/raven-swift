@@ -54,7 +54,7 @@ open class RavenConfig {
         }
         
         //The URL couldn't be parsed, so initialize to blank values and return nil
-        serverUrl = URL()
+        serverUrl = URL(string: "http://example.com")
         publicKey = ""
         secretKey = ""
         projectId = ""
