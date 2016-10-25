@@ -369,7 +369,8 @@ open class RavenClient : NSObject {
 
         // Process saved crash reports
         let reports : [AnyObject]? = UserDefaults.standard.array(forKey: userDefaultsKey) as [AnyObject]?
-        if (reports != nil && reports?.count > 0) {
+        
+        if let reports = reports, !reports.isEmpty {
             for data in reports! {
                 let JSONString = data as! String
                 let JSON = JSONString.data(using: String.Encoding.utf8, allowLossyConversion: false)
