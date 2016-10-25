@@ -26,7 +26,7 @@ class ViewController: UIViewController {
 
     
     @IBAction func raiseUnhandledException() {
-        NSException(name: "Raven test exception", reason: "No reason", userInfo: nil).raise()
+        NSException(name: NSExceptionName(rawValue: "Raven test exception"), reason: "No reason", userInfo: nil).raise()
     }
 }
 
