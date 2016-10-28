@@ -33,8 +33,8 @@ open class RavenConfig {
                 
                 let scheme: String = DSNURL.scheme ?? "http"
                 
-                var port = (DSNURL as NSURL).port
-                if (port == nil) {
+                var port = DSNURL.port
+                if port == nil {
                     if (DSNURL.scheme == "https") {
                         port = 443;
                     } else {
